@@ -172,7 +172,7 @@ def set_setting(db, key, value):
 
 def seed_base(db):
     if db.execute("SELECT COUNT(*) FROM accounts").fetchone()[0]:
-        return
+        return False
     accounts = [
         ("1010", "Cash", "asset_cash"), ("1020", "Bank", "asset_cash"),
         ("1100", "Accounts Receivable", "asset_receivable"), ("1200", "Inventory", "asset_current"),
@@ -209,6 +209,7 @@ def seed_base(db):
                  "payable_account_id": acc["2010"], "company_email": "", "company_address": "",
                  "company_vat": ""}.items():
         set_setting(db, k, v)
+    return True
 
 
 def seed_demo(db):
@@ -1275,6 +1276,62 @@ REPORTS = {"trial_balance": report_trial_balance, "profit_loss": report_profit_l
            "dashboard": report_dashboard, "journal_items": report_journal_items}
 
 
+# --------------------------------------------------------------------------- cloud persistence
+# When DATABASE_URL (Postgres) is set, the SQLite file is restored from Postgres at startup and a
+# snapshot is saved back after every change. This keeps data safe on hosts with a temporary disk.
+PG_URL = os.environ.get("DATABASE_URL")
+
+
+def _pg():
+    import psycopg  # only needed in the cloud: pip install "psycopg[binary]"
+    return psycopg.connect(PG_URL, autocommit=True)
+
+
+def pg_restore():
+    if not PG_URL:
+        return
+    with _pg() as c:
+        c.execute("CREATE TABLE IF NOT EXISTS ledger_snapshot(id INT PRIMARY KEY, data BYTEA NOT NULL, "
+                  "updated_at TIMESTAMPTZ DEFAULT now())")
+        row = c.execute("SELECT data FROM ledger_snapshot WHERE id=1").fetchone()
+    if row:
+        os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
+        for suffix in ("", "-wal", "-shm"):
+            if os.path.exists(DB_PATH + suffix):
+                os.remove(DB_PATH + suffix)
+        with open(DB_PATH, "wb") as f:
+            f.write(bytes(row[0]))
+        print(f"Restored database from Postgres ({len(row[0])} bytes)")
+
+
+def pg_save():
+    if not PG_URL:
+        return
+    tmp = DB_PATH + ".snapshot"
+    src, dst = sqlite3.connect(DB_PATH), sqlite3.connect(tmp)
+    src.backup(dst)
+    dst.close()
+    src.close()
+    with open(tmp, "rb") as f:
+        data = f.read()
+    os.remove(tmp)
+    with _pg() as c:
+        c.execute("INSERT INTO ledger_snapshot(id, data, updated_at) VALUES(1, %s, now()) "
+                  "ON CONFLICT(id) DO UPDATE SET data=excluded.data, updated_at=now()", (data,))
+
+
+def reset_database(db):
+    for t in ("payment_allocations", "payments", "move_lines", "invoice_lines", "moves", "app_records", "app_fields",
+              "apps", "products", "taxes", "analytic_accounts", "analytic_plans", "partners", "journals", "accounts",
+              "settings"):
+        db.execute(f"DELETE FROM {t}")
+    seed_base(db)
+
+
+APP_PASSWORD = os.environ.get("APP_PASSWORD")
+APP_USER = os.environ.get("APP_USER", "admin")
+
+
 # --------------------------------------------------------------------------- HTTP
 
 def handle_api(db, method, parts, q, body):
@@ -1293,6 +1350,12 @@ def handle_api(db, method, parts, q, body):
 
     if res == "demo" and method == "POST":
         seed_demo(db)
+        return {"ok": True}
+
+    if res == "reset" and method == "POST":
+        if body.get("confirm") != "DELETE":
+            raise UserError("Type DELETE to confirm.")
+        reset_database(db)
         return {"ok": True}
 
     if res == "app_templates":
@@ -1404,6 +1467,7 @@ class Handler(BaseHTTPRequestHandler):
                 with WRITE_LOCK:
                     result = handle_api(db, method, parts, q, body)
                     db.commit()
+                    pg_save()
             self.send(200, result)
         except UserError as e:
             db.rollback()
@@ -1442,34 +1506,61 @@ class Handler(BaseHTTPRequestHandler):
             ctype += "; charset=utf-8"
         self.send(200, data, ctype)
 
+    def authorized(self):
+        if not APP_PASSWORD:
+            return True
+        import base64
+        import hmac
+        h = self.headers.get("Authorization", "")
+        if h.startswith("Basic "):
+            try:
+                user, _, pwd = base64.b64decode(h[6:]).decode().partition(":")
+                if hmac.compare_digest(user, APP_USER) and hmac.compare_digest(pwd, APP_PASSWORD):
+                    return True
+            except Exception:
+                pass
+        self.send_response(401)
+        self.send_header("WWW-Authenticate", 'Basic realm="Ledger ERP"')
+        self.send_header("Content-Length", "0")
+        self.end_headers()
+        return False
+
     def do_GET(self):
-        self.api("GET") if self.path.startswith("/api/") else self.static()
+        if self.path == "/healthz":
+            return self.send(200, {"ok": True})
+        if self.authorized():
+            self.api("GET") if self.path.startswith("/api/") else self.static()
 
     def do_POST(self):
-        self.api("POST")
+        if self.authorized():
+            self.api("POST")
 
     def do_PUT(self):
-        self.api("PUT")
+        if self.authorized():
+            self.api("PUT")
 
     def do_DELETE(self):
-        self.api("DELETE")
+        if self.authorized():
+            self.api("DELETE")
 
 
 def init_db(demo=False):
+    pg_restore()
     db = connect()
     db.execute("PRAGMA journal_mode=WAL")
     db.executescript(SCHEMA)
-    seed_base(db)
-    if demo and not db.execute("SELECT COUNT(*) FROM moves").fetchone()[0]:
+    fresh = seed_base(db)
+    if demo and fresh:   # demo data only for a brand-new database
         seed_demo(db)
     db.commit()
     db.close()
+    pg_save()
 
 
 def main():
     init_db(demo="--demo" in sys.argv)
     port = int(os.environ.get("PORT", 8069))
-    host = os.environ.get("HOST", "127.0.0.1")
+    host = os.environ.get("HOST", "0.0.0.0" if os.environ.get("RENDER") else "127.0.0.1")
     srv = ThreadingHTTPServer((host, port), Handler)
     print(f"Ledger ERP running on http://localhost:{port}  (database: {DB_PATH})")
     print("Keep this window open while you use the app. Press Ctrl+C to stop.")

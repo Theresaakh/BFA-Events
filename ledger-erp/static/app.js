@@ -984,7 +984,11 @@ async function settingsView() {
       <div class="frow"><label></label><span class="muted small">No entry can be posted, reset or changed on or before the lock date.</span></div></div>
     <div class="section-title">Data</div>
     <p class="muted">Load a sample company (customers, vendors, projects, invoices, bills, payments, payroll) to explore the app. Only works while the database has no entries.</p>
-    <button class="btn" id="demo">Load demo data</button></div>`;
+    <button class="btn" id="demo">Load demo data</button>
+    <p class="muted" style="margin-top:18px">Start from scratch: delete <b>all</b> data (invoices, contacts, apps…) and restore the default chart of accounts.</p>
+    <button class="btn btn-danger" id="reset">Delete all data</button></div>`;
+  $('#reset').onclick = () => modal('Delete all data', '<p>This permanently deletes everything. Type <b>DELETE</b> to confirm.</p><input id="rs-c">',
+    [{ label: 'Delete everything', cls: 'btn-primary', click: async el => { await api.post('reset', { confirm: $('#rs-c', el).value }); await Promise.all([loadSettings(), loadRefs()]); toast('All data deleted', 'ok'); go('#/'); } }]);
   $('#save').onclick = async () => {
     const body = Object.fromEntries($$('[data-s]').map(i => [i.dataset.s, i.value]));
     await api.put('settings', body); await loadSettings(); toast('Settings saved', 'ok');
