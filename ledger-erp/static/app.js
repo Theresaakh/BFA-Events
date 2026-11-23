@@ -31,7 +31,13 @@ function toast(msg, kind = '') {
 }
 
 async function req(method, url, body) {
-  const r = await fetch('/api/' + url, { method, headers: body ? { 'Content-Type': 'application/json' } : {}, body: body ? JSON.stringify(body) : undefined });
+  let r;
+  try {
+    r = await fetch('/api/' + url, { method, headers: body ? { 'Content-Type': 'application/json' } : {}, body: body ? JSON.stringify(body) : undefined });
+  } catch (e) {
+    const msg = 'The app server is not running. Double-click start-windows.bat (and keep its black window open), then refresh this page.';
+    toast(msg, 'error'); throw new Error(msg);
+  }
   const data = await r.json().catch(() => ({}));
   if (!r.ok) { const msg = data.error || r.statusText; toast(msg, 'error'); throw new Error(msg); }
   return data;
