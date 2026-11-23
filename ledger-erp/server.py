@@ -1433,7 +1433,11 @@ class Handler(BaseHTTPRequestHandler):
             full = os.path.join(STATIC, "index.html")
         with open(full, "rb") as f:
             data = f.read()
-        ctype = mimetypes.guess_type(full)[0] or "application/octet-stream"
+        ext = os.path.splitext(full)[1].lower()
+        # explicit types: on Windows, mimetypes reads the registry and can return text/plain for .js/.css
+        ctype = {".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".svg": "image/svg+xml",
+                 ".png": "image/png", ".ico": "image/x-icon", ".json": "application/json"}.get(ext) \
+            or mimetypes.guess_type(full)[0] or "application/octet-stream"
         if ctype.startswith("text/") or ctype.endswith("javascript"):
             ctype += "; charset=utf-8"
         self.send(200, data, ctype)
@@ -1467,7 +1471,8 @@ def main():
     port = int(os.environ.get("PORT", 8069))
     host = os.environ.get("HOST", "127.0.0.1")
     srv = ThreadingHTTPServer((host, port), Handler)
-    print(f"Ledger ERP running on http://{host}:{port}  (database: {DB_PATH})")
+    print(f"Ledger ERP running on http://localhost:{port}  (database: {DB_PATH})")
+    print("Keep this window open while you use the app. Press Ctrl+C to stop.")
     try:
         srv.serve_forever()
     except KeyboardInterrupt:
