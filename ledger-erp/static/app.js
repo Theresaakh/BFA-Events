@@ -27,10 +27,16 @@ function toast(msg, kind = '') {
   const t = document.createElement('div');
   t.className = 'toast ' + kind; t.textContent = msg;
   $('#toasts').appendChild(t);
-  setTimeout(() => t.remove(), kind === 'error' ? 6000 : 3000);
+  setTimeout(() => { t.classList.add('out'); setTimeout(() => t.remove(), 260); }, kind === 'error' ? 6000 : 3000);
 }
 
+let pending = 0;
+function busy(d) { pending = Math.max(0, pending + d); document.body.classList.toggle('loading', pending > 0); }
 async function req(method, url, body) {
+  busy(1);
+  try { return await reqInner(method, url, body); } finally { busy(-1); }
+}
+async function reqInner(method, url, body) {
   let r;
   try {
     r = await fetch('/api/' + url, { method, headers: body ? { 'Content-Type': 'application/json' } : {}, body: body ? JSON.stringify(body) : undefined });
@@ -86,6 +92,8 @@ function modal(title, body, buttons) {
     f.appendChild(el);
   });
   const c = document.createElement('button'); c.className = 'btn'; c.textContent = 'Discard'; c.onclick = close; f.appendChild(c);
+  const onKey = e => { if (e.key === 'Escape') { close(); document.removeEventListener('keydown', onKey); } };
+  document.addEventListener('keydown', onKey);
   const first = $('input,select,textarea', $('.modal-b', root)); if (first) first.focus();
   return $('.modal', root);
 }
@@ -169,18 +177,21 @@ async function route() {
 function home() {
   setNav('', []);
   const builtins = [
-    { name: 'Accounting', icon: '📒', color: '#714B67', href: '#/accounting/dashboard' },
-    { name: 'Invoicing', icon: '🧾', color: '#00a09d', href: '#/accounting/moves/invoices' },
-    { name: 'Bills', icon: '📥', color: '#e46e78', href: '#/accounting/moves/bills' },
-    { name: 'Contacts', icon: '👤', color: '#3c6e9f', href: '#/contacts' },
-    { name: 'Reports', icon: '📊', color: '#f4a261', href: '#/accounting/report/profit_loss' },
+    { name: 'Accounting', icon: '📒', color: 'linear-gradient(135deg,#2a8a66,#145a42)', href: '#/accounting/dashboard' },
+    { name: 'Invoicing', icon: '🧾', color: 'linear-gradient(135deg,#43c29a,#1d8f6c)', href: '#/accounting/moves/invoices' },
+    { name: 'Bills', icon: '📥', color: 'linear-gradient(135deg,#f0907a,#cf5a45)', href: '#/accounting/moves/bills' },
+    { name: 'Contacts', icon: '👤', color: 'linear-gradient(135deg,#4f9bc4,#2a6c93)', href: '#/contacts' },
+    { name: 'Reports', icon: '📊', color: 'linear-gradient(135deg,#e8bf5c,#c99528)', href: '#/accounting/report/profit_loss' },
   ];
   const custom = S.apps.map(a => ({ name: a.name, icon: a.icon || '📦', color: a.color || '#6c757d', href: `#/app/${a.id}` }));
-  const tail = [{ name: 'App Builder', icon: '🛠️', color: '#455a64', href: '#/studio' }, { name: 'Settings', icon: '⚙️', color: '#607d8b', href: '#/settings' }];
-  const tile = a => `<a class="app-tile" href="${a.href}"><div class="app-icon" style="background:${esc(a.color)}">${esc(a.icon)}</div><div>${esc(a.name)}</div></a>`;
-  view().innerHTML = `<div class="home"><h1>${esc(S.settings.company_name || 'Ledger ERP')}</h1><div class="home-grid">
-    ${[...builtins, ...custom, ...tail].map(tile).join('')}
-    <a class="app-tile add" href="#/studio?new=1"><div class="app-icon">＋</div><div>New App</div></a></div></div>`;
+  const tail = [{ name: 'App Builder', icon: '🛠️', color: 'linear-gradient(135deg,#557a6b,#2f4d41)', href: '#/studio' }, { name: 'Settings', icon: '⚙️', color: 'linear-gradient(135deg,#8a9a93,#5c6c65)', href: '#/settings' }];
+  const tile = (a, i) => `<a class="app-tile" href="${a.href}" style="animation-delay:${i * 40}ms"><div class="app-icon" style="background:${esc(a.color)}">${esc(a.icon)}</div><div>${esc(a.name)}</div></a>`;
+  const all = [...builtins, ...custom, ...tail];
+  const hr = new Date().getHours(), greet = hr < 12 ? 'Good morning' : hr < 18 ? 'Good afternoon' : 'Good evening';
+  view().innerHTML = `<div class="home"><h1>${esc(S.settings.company_name || 'Ledger ERP')}</h1>
+    <div class="sub">${greet} · ${new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</div><div class="home-grid">
+    ${all.map(tile).join('')}
+    <a class="app-tile add" href="#/studio?new=1" style="animation-delay:${all.length * 40}ms"><div class="app-icon">＋</div><div>New App</div></a></div></div>`;
 }
 
 // ----------------------------------------------------------------- dashboard
@@ -204,12 +215,12 @@ async function dashboard() {
       btns = `<a class="btn btn-primary" href="#/accounting/move/new?type=entry&journal_id=${j.id}">New Entry</a>`;
       body = `<div class="stat"><span>${j.entries} posted entries</span></div><div class="stat"><a href="#/accounting/moves/entries?state=draft">${j.draft} drafts</a></div>`;
     }
-    return `<div class="card" style="border-top-color:${esc(j.color || '#714B67')}"><h3>${esc(j.name)}</h3><div class="muted small">${esc(j.code)} · ${esc(j.type)}</div>${body}<div class="row">${btns}</div></div>`;
+    return `<div class="card" style="border-top-color:${esc(j.color || '#1d6b50')}"><h3>${esc(j.name)}</h3><div class="muted small">${esc(j.code)} · ${esc(j.type)}</div>${body}<div class="row">${btns}</div></div>`;
   };
   view().innerHTML = cp([['Accounting Dashboard']]) + `<div class="content">
     <div class="kpis">${kpi('Cash & Bank', k.cash, '#/accounting/report/balance_sheet')}${kpi('Receivable', k.receivable, '#/accounting/report/aged_receivable')}${kpi('Payable', k.payable, '#/accounting/report/aged_payable')}${kpi('Income this month', k.income_month, '#/accounting/report/profit_loss')}${kpi('Expenses this month', k.expense_month, '#/accounting/report/profit_loss')}${kpi('Profit this year', k.profit_year, '#/accounting/report/profit_loss')}</div>
     <div class="chart-box"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><b>Income vs Expenses – last 12 months</b>
-      <div class="legend"><span><i style="background:#714B67"></i>Income</span><span><i style="background:#e9a3b0"></i>Expenses</span></div></div>${barChart(d.months)}</div>
+      <div class="legend"><span><i style="background:#1d6b50"></i>Income</span><span><i style="background:#e3b752"></i>Expenses</span></div></div>${barChart(d.months)}</div>
     <div class="cards">${d.journals.map(card).join('')}</div></div>`;
 }
 
@@ -219,11 +230,13 @@ function barChart(months) {
   let bars = '';
   months.forEach((m, i) => {
     const x = P + i * bw, hi = (m.income / max) * (H - 50), he = (m.expense / max) * (H - 50);
-    bars += `<rect x="${x + bw * .15}" y="${H - 25 - hi}" width="${bw * .33}" height="${Math.max(hi, 0)}" fill="#714B67" rx="2"><title>Income ${money(m.income)}</title></rect>`;
-    bars += `<rect x="${x + bw * .52}" y="${H - 25 - he}" width="${bw * .33}" height="${Math.max(he, 0)}" fill="#e9a3b0" rx="2"><title>Expenses ${money(m.expense)}</title></rect>`;
+    bars += `<rect x="${x + bw * .15}" y="${H - 25 - hi}" width="${bw * .33}" height="${Math.max(hi, 0)}" fill="url(#gInc)" rx="4" style="animation-delay:${i * 35}ms"><title>Income ${money(m.income)}</title></rect>`;
+    bars += `<rect x="${x + bw * .52}" y="${H - 25 - he}" width="${bw * .33}" height="${Math.max(he, 0)}" fill="url(#gExp)" rx="4" style="animation-delay:${i * 35 + 20}ms"><title>Expenses ${money(m.expense)}</title></rect>`;
     bars += `<text x="${x + bw / 2}" y="${H - 8}" text-anchor="middle" font-size="11" fill="#6b7280">${m.month.slice(5)}/${m.month.slice(2, 4)}</text>`;
   });
-  return `<svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}" preserveAspectRatio="none"><line x1="${P}" x2="${W - P}" y1="${H - 25}" y2="${H - 25}" stroke="#e2e5ea"/>${bars}</svg>`;
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}" preserveAspectRatio="none"><defs>
+    <linearGradient id="gInc" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3cb488"/><stop offset="1" stop-color="#145a42"/></linearGradient>
+    <linearGradient id="gExp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f0cf7a"/><stop offset="1" stop-color="#d29f30"/></linearGradient></defs><line x1="${P}" x2="${W - P}" y1="${H - 25}" y2="${H - 25}" stroke="#e2e5ea"/>${bars}</svg>`;
 }
 
 // ----------------------------------------------------------------- moves list
@@ -579,9 +592,9 @@ const JOURNAL_TYPES = [['sale', 'Sales'], ['purchase', 'Purchase'], ['bank', 'Ba
 
 const MODELS = {
   accounts: { title: 'Chart of Accounts', icon: '📚', fields: [{ k: 'code', l: 'Code', req: 1 }, { k: 'name', l: 'Account Name', req: 1 }, { k: 'type', l: 'Type', t: 'select', o: () => ACCOUNT_TYPES, req: 1 }, { k: 'reconcile', l: 'Allow Reconciliation', t: 'bool' }, { k: 'active', l: 'Active', t: 'bool', def: 1 }], cols: ['code', 'name', 'type', 'active'], group: r => nm(ACCOUNT_TYPES.map(([id, name]) => ({ id, name })), r.type) },
-  journals: { title: 'Journals', icon: '📓', fields: [{ k: 'name', l: 'Journal Name', req: 1 }, { k: 'code', l: 'Short Code', req: 1 }, { k: 'type', l: 'Type', t: 'select', o: () => JOURNAL_TYPES, req: 1 }, { k: 'default_account_id', l: 'Default Account', t: 'm2o', m: 'accounts' }, { k: 'color', l: 'Color', t: 'color', def: '#714B67' }], cols: ['code', 'name', 'type', 'default_account_id'] },
+  journals: { title: 'Journals', icon: '📓', fields: [{ k: 'name', l: 'Journal Name', req: 1 }, { k: 'code', l: 'Short Code', req: 1 }, { k: 'type', l: 'Type', t: 'select', o: () => JOURNAL_TYPES, req: 1 }, { k: 'default_account_id', l: 'Default Account', t: 'm2o', m: 'accounts' }, { k: 'color', l: 'Color', t: 'color', def: '#1d6b50' }], cols: ['code', 'name', 'type', 'default_account_id'] },
   taxes: { title: 'Taxes', icon: '％', fields: [{ k: 'name', l: 'Tax Name', req: 1 }, { k: 'rate', l: 'Rate (%)', t: 'number', req: 1 }, { k: 'type_tax_use', l: 'Tax Type', t: 'select', o: () => [['sale', 'Sales'], ['purchase', 'Purchases']], req: 1 }, { k: 'account_id', l: 'Tax Account', t: 'm2o', m: 'accounts' }, { k: 'active', l: 'Active', t: 'bool', def: 1 }], cols: ['name', 'rate', 'type_tax_use', 'account_id', 'active'] },
-  analytic_plans: { title: 'Analytic Plans', icon: '🗂️', fields: [{ k: 'name', l: 'Plan Name', req: 1 }, { k: 'color', l: 'Color', t: 'color', def: '#714B67' }], cols: ['name'] },
+  analytic_plans: { title: 'Analytic Plans', icon: '🗂️', fields: [{ k: 'name', l: 'Plan Name', req: 1 }, { k: 'color', l: 'Color', t: 'color', def: '#1d6b50' }], cols: ['name'] },
   analytic_accounts: { title: 'Analytic Accounts', icon: '🎯', fields: [{ k: 'name', l: 'Name', req: 1 }, { k: 'code', l: 'Reference' }, { k: 'plan_id', l: 'Plan', t: 'm2o', m: 'analytic_plans' }, { k: 'partner_id', l: 'Customer', t: 'm2o', m: 'partners' }, { k: 'budget', l: 'Budget', t: 'money' }, { k: 'active', l: 'Active', t: 'bool', def: 1 }], cols: ['code', 'name', 'plan_id', 'partner_id', 'budget'], extra: r => `<a class="btn btn-sm" href="#/accounting/report/analytic?only_id=${r.id}" onclick="event.stopPropagation()">Report</a>` },
   products: { title: 'Products & Services', icon: '📦', fields: [{ k: 'name', l: 'Name', req: 1 }, { k: 'code', l: 'Internal Reference' }, { k: 'sale_price', l: 'Sales Price', t: 'money' }, { k: 'cost', l: 'Cost', t: 'money' }, { k: 'income_account_id', l: 'Income Account', t: 'm2o', m: 'accounts' }, { k: 'expense_account_id', l: 'Expense Account', t: 'm2o', m: 'accounts' }, { k: 'sale_tax_id', l: 'Customer Tax', t: 'm2o', m: 'taxes', f: x => x.type_tax_use === 'sale' }, { k: 'purchase_tax_id', l: 'Vendor Tax', t: 'm2o', m: 'taxes', f: x => x.type_tax_use === 'purchase' }, { k: 'active', l: 'Active', t: 'bool', def: 1 }], cols: ['code', 'name', 'sale_price', 'cost', 'income_account_id', 'expense_account_id'] },
   partners: { title: 'Contacts', icon: '👤', fields: [{ k: 'name', l: 'Name', req: 1 }, { k: 'email', l: 'Email' }, { k: 'phone', l: 'Phone' }, { k: 'street', l: 'Street' }, { k: 'city', l: 'City' }, { k: 'country', l: 'Country' }, { k: 'vat', l: 'Tax ID' }, { k: 'is_customer', l: 'Is a Customer', t: 'bool', def: 1 }, { k: 'is_vendor', l: 'Is a Vendor', t: 'bool' }, { k: 'payment_term_days', l: 'Payment Terms (days)', t: 'number', def: 30 }, { k: 'notes', l: 'Notes', t: 'text' }], cols: ['name', 'email', 'phone', 'city'] },
@@ -610,7 +623,7 @@ function fieldInput(f, v, id) {
     case 'number': case 'money': return `<input type="number" step="any" ${a} value="${esc(val)}">`;
     case 'date': return `<input type="date" ${a} value="${esc(val)}">`;
     case 'text': return `<textarea ${a}>${esc(val)}</textarea>`;
-    case 'color': return `<input type="color" ${a} value="${esc(val || '#714B67')}" style="height:34px;padding:2px">`;
+    case 'color': return `<input type="color" ${a} value="${esc(val || '#1d6b50')}" style="height:34px;padding:2px">`;
     default: return `<input ${a} value="${esc(val)}">`;
   }
 }
@@ -853,7 +866,7 @@ async function studio(q) {
   $$('[data-tpl]').forEach(b => b.onclick = async () => { const a = await api.post('apps/from_template', { template: b.dataset.tpl }); await loadRefs(['apps']); toast(`${a.name} installed`, 'ok'); go('#/app/' + a.id); });
   const newApp = () => {
     modal('New App', `<div class="fgrid"><div class="frow"><label>App Name *</label><input id="a-name" placeholder="e.g. Clinics, Workshops, Contracts"></div>
-      <div class="frow"><label>Icon (emoji)</label><input id="a-icon" value="📦" maxlength="4"></div><div class="frow"><label>Color</label><input id="a-color" type="color" value="#3c6e9f" style="height:34px;padding:2px"></div>
+      <div class="frow"><label>Icon (emoji)</label><input id="a-icon" value="📦" maxlength="4"></div><div class="frow"><label>Color</label><input id="a-color" type="color" value="#1d6b50" style="height:34px;padding:2px"></div>
       <div class="frow top"><label>Description</label><textarea id="a-desc"></textarea></div></div>`,
       [{ label: 'Create', cls: 'btn-primary', click: async el => {
         const a = await api.post('apps', { name: $('#a-name', el).value, icon: $('#a-icon', el).value, color: $('#a-color', el).value, description: $('#a-desc', el).value });

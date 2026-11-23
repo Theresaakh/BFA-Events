@@ -197,14 +197,14 @@ def seed_base(db):
         ("BILL", "Vendor Bills", "purchase", "6900", "#c62828"),
         ("BNK1", "Bank", "bank", "1020", "#1565c0"),
         ("CSH1", "Cash", "cash", "1010", "#ef6c00"),
-        ("MISC", "Miscellaneous Operations", "general", None, "#6a1b9a"),
+        ("MISC", "Miscellaneous Operations", "general", None, "#1d6b50"),
     ]:
         db.execute("INSERT INTO journals(code,name,type,default_account_id,color) VALUES(?,?,?,?,?)",
                    (code, name, typ, acc.get(a), color))
     for name, rate, use, a in [("VAT 15%", 15, "sale", "2100"), ("VAT 15%", 15, "purchase", "1400"),
                                ("Exempt 0%", 0, "sale", "2100"), ("Exempt 0%", 0, "purchase", "1400")]:
         db.execute("INSERT INTO taxes(name,rate,type_tax_use,account_id) VALUES(?,?,?,?)", (name, rate, use, acc[a]))
-    db.execute("INSERT INTO analytic_plans(name,color) VALUES('Projects','#714B67'),('Departments','#00838f')")
+    db.execute("INSERT INTO analytic_plans(name,color) VALUES('Projects','#1d6b50'),('Departments','#2a85b8')")
     for k, v in {"company_name": "My Company", "currency": "$", "receivable_account_id": acc["1100"],
                  "payable_account_id": acc["2010"], "company_email": "", "company_address": "",
                  "company_vat": ""}.items():
@@ -333,7 +333,7 @@ def seed_demo(db):
 
 
 APP_TEMPLATES = {
-    "projects": {"name": "Projects", "icon": "📁", "color": "#714B67",
+    "projects": {"name": "Projects", "icon": "📁", "color": "#2a8a66",
                  "description": "Track client projects and their profitability through analytic accounts.",
                  "fields": [("name", "Project Name", "char", "", 1), ("customer", "Customer", "partner", "", 0),
                             ("analytic", "Analytic Account", "analytic", "", 0),
@@ -1550,6 +1550,10 @@ def init_db(demo=False):
     db.execute("PRAGMA journal_mode=WAL")
     db.executescript(SCHEMA)
     fresh = seed_base(db)
+    # theme migration: old purple defaults -> evergreen
+    db.execute("UPDATE apps SET color='#2a8a66' WHERE lower(color)='#714b67'")
+    db.execute("UPDATE analytic_plans SET color='#1d6b50' WHERE lower(color)='#714b67'")
+    db.execute("UPDATE journals SET color='#1d6b50' WHERE lower(color)='#6a1b9a'")
     if demo and fresh:   # demo data only for a brand-new database
         seed_demo(db)
     db.commit()
