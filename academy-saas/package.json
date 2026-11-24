@@ -9,7 +9,8 @@
     "lint": "eslint",
     "test": "vitest run",
     "check:i18n": "node scripts/check-i18n.mjs",
-    "check": "npm run lint && tsc --noEmit && npm test && npm run check:i18n"
+    "check": "npm run lint && tsc --noEmit && npm test && npm run check:i18n",
+    "build:demo": "vite build --config demo/vite.config.ts && node demo/to-artifact.mjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -22,13 +23,17 @@
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "4.3.3",
+    "@tailwindcss/vite": "^4.3.3",
     "@types/node": "^22.20.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^5.2.0",
     "eslint": "^9",
     "eslint-config-next": "16.4.6",
     "tailwindcss": "4.3.3",
     "typescript": "^5",
+    "vite": "^7.3.8",
+    "vite-plugin-singlefile": "^2.3.4",
     "vitest": "^5.1.1"
   }
 }

@@ -1,0 +1,5 @@
+@import "../src/app/globals.css";
+@source "../src";
+:root { --font-inter: "Inter"; --font-arabic: "IBM Plex Sans Arabic"; }
+/* The artifact viewer can't print or download files: hide those buttons in this build. */
+button:has(> svg.lucide-printer), button:has(> svg.lucide-download) { display: none !important; }
