@@ -641,7 +641,8 @@
     "signup": {
       "title": "Create account",
       "subtitle": "Start with your own account. You'll set up your academy next.",
-      "checkEmail": "Check your inbox: we sent you a link to confirm your email address."
+      "checkEmail": "Check your inbox: we sent you a link to confirm your email address.",
+      "created": "Account created. You can sign in now."
     },
     "forgot": {
       "title": "Reset password",

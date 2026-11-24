@@ -44,6 +44,7 @@ export async function signUp(_: AuthState, fd: FormData): Promise<AuthState> {
     // An existing email gets the same answer as a new one (no account enumeration).
     if (!code.startsWith('USER_ALREADY_EXISTS')) return { error: 'auth.errors.generic', values: keep(fd) };
   }
+  if (process.env.REQUIRE_EMAIL_VERIFICATION === 'false') redirect(`/${locale}/login?created=1`);
   return { success: 'auth.signup.checkEmail' };
 }
 

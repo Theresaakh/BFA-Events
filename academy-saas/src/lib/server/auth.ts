@@ -10,6 +10,8 @@ import { authSchemaOptions } from './auth-schema';
  * Accounts (Better Auth). Users, sessions and login methods live in our own PostgreSQL
  * tables (auth_user, auth_session, auth_account, auth_verification) — no outside login service.
  */
+const requireVerification = process.env.REQUIRE_EMAIL_VERIFICATION !== 'false';
+
 export const auth = betterAuth({
   appName: 'AcademyOS',
   baseURL: SITE_URL,
@@ -21,7 +23,8 @@ export const auth = betterAuth({
     enabled: true,
     minPasswordLength: 10,
     maxPasswordLength: 72,
-    requireEmailVerification: true,
+    // Turn off only for a preview without an email service (REQUIRE_EMAIL_VERIFICATION=false).
+    requireEmailVerification: requireVerification,
     resetPasswordTokenExpiresIn: 60 * 60,
     revokeSessionsOnPasswordReset: true,
     sendResetPassword: async ({ user, url }) => {
@@ -29,7 +32,7 @@ export const auth = betterAuth({
     },
   },
   emailVerification: {
-    sendOnSignUp: true,
+    sendOnSignUp: requireVerification,
     autoSignInAfterVerification: true,
     sendVerificationEmail: async ({ user, url }) => {
       await sendEmail({ to: user.email, kind: 'verify', url });

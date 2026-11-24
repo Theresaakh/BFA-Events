@@ -641,7 +641,8 @@
     "signup": {
       "title": "Créer un compte",
       "subtitle": "Commencez par votre compte. Vous configurerez votre académie ensuite.",
-      "checkEmail": "Vérifiez votre boîte de réception : nous vous avons envoyé un lien pour confirmer votre adresse e-mail."
+      "checkEmail": "Vérifiez votre boîte de réception : nous vous avons envoyé un lien pour confirmer votre adresse e-mail.",
+      "created": "Compte créé. Vous pouvez vous connecter."
     },
     "forgot": {
       "title": "Réinitialiser",

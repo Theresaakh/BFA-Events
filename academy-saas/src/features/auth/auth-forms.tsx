@@ -20,7 +20,7 @@ export function SignInForm() {
   const t = useTranslations('auth');
   const locale = useLocale();
   const params = useSearchParams();
-  const initial: AuthState = params.get('reset') ? { success: 'auth.reset.done' } : params.get('error') ? { error: 'auth.errors.linkExpired' } : {};
+  const initial: AuthState = params.get('created') ? { success: 'auth.signup.created' } : params.get('reset') ? { success: 'auth.reset.done' } : params.get('error') ? { error: 'auth.errors.linkExpired' } : {};
   const [state, action, pending] = useActionState(signIn, initial);
   return (
     <form action={action} className="space-y-4" noValidate>
