@@ -20,13 +20,14 @@ export function SignInForm() {
   const t = useTranslations('auth');
   const locale = useLocale();
   const params = useSearchParams();
-  const [state, action, pending] = useActionState(signIn, params.get('error') === 'link' ? { error: 'auth.errors.linkExpired' } : {});
+  const initial: AuthState = params.get('reset') ? { success: 'auth.reset.done' } : params.get('error') ? { error: 'auth.errors.linkExpired' } : {};
+  const [state, action, pending] = useActionState(signIn, initial);
   return (
     <form action={action} className="space-y-4" noValidate>
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="next" value={params.get('next') ?? ''} />
       <Feedback state={state} />
-      <Field label={t('email')} error={state.fields?.email}><Input name="email" type="email" autoComplete="email" dir="ltr" required invalid={!!state.fields?.email} /></Field>
+      <Field label={t('email')} error={state.fields?.email}><Input name="email" type="email" autoComplete="email" dir="ltr" required defaultValue={state.values?.email} invalid={!!state.fields?.email} /></Field>
       <Field label={<span className="flex justify-between"><span>{t('password')}</span><Link href="/forgot-password" className="font-medium text-brand-700 hover:underline">{t('forgotLink')}</Link></span>} error={state.fields?.password}>
         <Input name="password" type="password" autoComplete="current-password" required invalid={!!state.fields?.password} />
       </Field>
@@ -45,8 +46,8 @@ export function SignUpForm() {
     <form action={action} className="space-y-4" noValidate>
       <input type="hidden" name="locale" value={locale} />
       <Feedback state={state} />
-      <Field label={t('fullName')} error={state.fields?.fullName}><Input name="fullName" autoComplete="name" required invalid={!!state.fields?.fullName} /></Field>
-      <Field label={t('email')} error={state.fields?.email}><Input name="email" type="email" autoComplete="email" dir="ltr" required invalid={!!state.fields?.email} /></Field>
+      <Field label={t('fullName')} error={state.fields?.fullName}><Input name="fullName" autoComplete="name" required defaultValue={state.values?.fullName} invalid={!!state.fields?.fullName} /></Field>
+      <Field label={t('email')} error={state.fields?.email}><Input name="email" type="email" autoComplete="email" dir="ltr" required defaultValue={state.values?.email} invalid={!!state.fields?.email} /></Field>
       <Field label={t('password')} hint={t('passwordHint')} error={state.fields?.password}><Input name="password" type="password" autoComplete="new-password" required invalid={!!state.fields?.password} /></Field>
       <Button type="submit" variant="primary" className="w-full" disabled={pending}>{pending ? t('pleaseWait') : t('createAccount')}</Button>
       <p className="text-center text-xs text-muted">{t('termsNote')}</p>
@@ -64,7 +65,7 @@ export function ForgotForm() {
       <input type="hidden" name="locale" value={locale} />
       <Feedback state={state} />
       {!state.success && <>
-        <Field label={t('email')} error={state.fields?.email}><Input name="email" type="email" autoComplete="email" dir="ltr" required invalid={!!state.fields?.email} /></Field>
+        <Field label={t('email')} error={state.fields?.email}><Input name="email" type="email" autoComplete="email" dir="ltr" required defaultValue={state.values?.email} invalid={!!state.fields?.email} /></Field>
         <Button type="submit" variant="primary" className="w-full" disabled={pending}>{pending ? t('pleaseWait') : t('forgot.send')}</Button>
       </>}
       <Link href="/login" className="block text-center text-sm font-semibold text-brand-700 hover:underline">{t('backToSignIn')}</Link>
@@ -75,10 +76,12 @@ export function ForgotForm() {
 export function ResetForm() {
   const t = useTranslations('auth');
   const locale = useLocale();
-  const [state, action, pending] = useActionState(updatePassword, {});
+  const params = useSearchParams();
+  const [state, action, pending] = useActionState(updatePassword, params.get('error') ? { error: 'auth.errors.linkExpired' } : {});
   return (
     <form action={action} className="space-y-4" noValidate>
       <input type="hidden" name="locale" value={locale} />
+      <input type="hidden" name="token" value={params.get('token') ?? ''} />
       <Feedback state={state} />
       <Field label={t('newPassword')} hint={t('passwordHint')} error={state.fields?.password}><Input name="password" type="password" autoComplete="new-password" required invalid={!!state.fields?.password} /></Field>
       <Field label={t('confirmPassword')} error={state.fields?.confirm}><Input name="confirm" type="password" autoComplete="new-password" required invalid={!!state.fields?.confirm} /></Field>

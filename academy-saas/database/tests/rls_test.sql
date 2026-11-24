@@ -2,11 +2,11 @@
 --   psql -v ON_ERROR_STOP=1 -f local_auth_stub.sql -f ../migrations/*.sql -f rls_test.sql
 \set QUIET on
 -- ---------- fixtures (as superuser, bypassing RLS) ----------
-insert into auth.users(id,email) values
- ('00000000-0000-0000-0000-00000000000a','owner.a@example.test'),
- ('00000000-0000-0000-0000-00000000000c','coach.a@example.test'),
- ('00000000-0000-0000-0000-00000000000f','finance.a@example.test'),
- ('00000000-0000-0000-0000-00000000000b','owner.b@example.test');
+insert into auth_user(id,name,email,email_verified) values
+ ('00000000-0000-0000-0000-00000000000a','Test','owner.a@example.test',true),
+ ('00000000-0000-0000-0000-00000000000c','Test','coach.a@example.test',true),
+ ('00000000-0000-0000-0000-00000000000f','Test','finance.a@example.test',true),
+ ('00000000-0000-0000-0000-00000000000b','Test','owner.b@example.test',true);
 insert into academies(id,name,slug,currency) values
  ('aaaaaaaa-0000-0000-0000-000000000000','Academy A','academy-a','USD'),
  ('bbbbbbbb-0000-0000-0000-000000000000','Academy B','academy-b','EUR');
@@ -50,7 +50,7 @@ grant usage on schema t to authenticated, anon; grant execute on all functions i
 \set QUIET off
 
 -- =========== Owner of Academy B: must see nothing of Academy A ===========
-select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-00000000000b',false);
+select set_config('app.user_id','00000000-0000-0000-0000-00000000000b',false);
 set role authenticated;
 select t.ok((select count(*) from players) = 1, 'owner B sees only their own 1 player');
 select t.ok((select count(*) from players where academy_id='aaaaaaaa-0000-0000-0000-000000000000') = 0, 'owner B sees 0 players of academy A');
@@ -62,7 +62,7 @@ reset role;
 select t.ok((select count(*) from players where first_name='Hacked') = 0, 'owner B update on academy A changed 0 rows');
 
 -- =========== Coach of Academy A: only own team ===========
-select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-00000000000c',false);
+select set_config('app.user_id','00000000-0000-0000-0000-00000000000c',false);
 set role authenticated;
 select t.ok((select count(*) from players) = 1 and (select last_name from players) = 'InA1', 'coach sees only the player in their team');
 select t.ok((select count(*) from player_contacts) = 1, 'coach sees only contacts of their own players');
@@ -86,14 +86,14 @@ select t.ok((select count(*) from coaches) = 1, 'coach sees only themselves / th
 reset role;
 
 -- =========== Owner A corrects attendance -> audited ===========
-select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-00000000000a',false);
+select set_config('app.user_id','00000000-0000-0000-0000-00000000000a',false);
 set role authenticated;
 update attendance_records set status='excused', updated_by=auth.uid(), updated_at=now() where player_id='d1000000-0000-0000-0000-000000000000';
 select t.ok((select count(*) from audit_log where table_name='attendance_records' and action='UPDATE' and actor_id=auth.uid()) = 1, 'owner correction is in the audit log with the actor');
 reset role;
 
 -- =========== Finance A: invoice 100, payments 40 + 30 ===========
-select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-00000000000f',false);
+select set_config('app.user_id','00000000-0000-0000-0000-00000000000f',false);
 set role authenticated;
 insert into invoices(id,academy_id,number,player_id,currency,issue_date,due_date,status) values
  ('f1000000-0000-0000-0000-000000000000','aaaaaaaa-0000-0000-0000-000000000000','INV-1','d1000000-0000-0000-0000-000000000000','USD',current_date,current_date+30,'issued');
@@ -117,7 +117,7 @@ select t.ok((select count(*) from audit_log) = 0, 'finance cannot read the audit
 reset role;
 
 -- =========== Owner B cannot see A's money ===========
-select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-00000000000b',false);
+select set_config('app.user_id','00000000-0000-0000-0000-00000000000b',false);
 set role authenticated;
 select t.ok((select count(*) from invoices) = 0 and (select count(*) from payments) = 0 and (select count(*) from invoice_balances) = 0, 'owner B sees no invoices/payments/balances of academy A');
 reset role;
@@ -126,10 +126,12 @@ set role anon;
 select t.fails($$select count(*) from players$$, 'anonymous users cannot read players');
 reset role;
 -- profile auto-creation
-insert into auth.users(id,email,raw_user_meta_data) values ('00000000-0000-0000-0000-0000000000ee','new@example.test','{"full_name":"New Person","locale":"ar"}');
+insert into auth_user(id,name,email,email_verified,locale) values ('00000000-0000-0000-0000-0000000000ee','New Person','new@example.test',false,'ar');
 select t.ok((select full_name='New Person' and preferred_locale='ar' from profiles where id='00000000-0000-0000-0000-0000000000ee'), 'new auth user gets a profile automatically');
-select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-00000000000b',false);
+select set_config('app.user_id','00000000-0000-0000-0000-00000000000b',false);
 set role authenticated;
+select t.fails($$select count(*) from auth_user$$, 'signed-in users cannot read the accounts table');
+select t.fails($$select count(*) from auth_session$$, 'signed-in users cannot read sessions');
 select t.ok((select count(*) from profiles) = 1 and (select id from profiles) = '00000000-0000-0000-0000-00000000000b', 'users see only their own profile, never other people''s');
 reset role;
 \echo ALL TESTS PASSED

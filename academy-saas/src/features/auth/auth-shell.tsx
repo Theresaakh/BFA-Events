@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 import { APP_NAME } from '@/config/app';
-import { supabaseConfigured } from '@/lib/supabase/env';
+import { accountsEnabled } from '@/lib/accounts-enabled';
 import { AuthLanguageSwitch } from './language-switch';
 
 /** Split layout: brand panel (pitch markings) + form. Collapses to the form only on phones. */
@@ -33,7 +33,7 @@ export function AuthShell({ title, subtitle, children }: { title: string; subtit
         <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center py-10">
           <h1 className="font-display text-4xl font-bold uppercase leading-none">{title}</h1>
           {subtitle && <p className="mt-2 text-sm text-muted">{subtitle}</p>}
-          {!supabaseConfigured && <p className="mt-5 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-900">{t('demoNotice')}</p>}
+          {!accountsEnabled && <p className="mt-5 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-900">{t('demoNotice')}</p>}
           <div className="mt-7">{children}</div>
         </div>
       </main>

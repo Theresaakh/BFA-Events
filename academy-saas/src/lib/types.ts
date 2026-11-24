@@ -1,5 +1,5 @@
 /**
- * TypeScript mirror of the database schema (supabase/migrations).
+ * TypeScript mirror of the database schema (database/migrations).
  * Money is ALWAYS an integer number of minor units (cents) + an ISO-4217 currency code.
  */
 import type { Locale } from '@/i18n/routing';

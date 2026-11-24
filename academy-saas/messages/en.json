@@ -621,7 +621,7 @@
     "panelTitle": "Run your academy like a pro club",
     "panelText": "Players, teams, attendance, schedules, invoices and payments in one secure place, in English, Arabic and French.",
     "panelFooter": "Your academy's data is private and separated from every other academy.",
-    "demoNotice": "Accounts aren't connected yet: this copy runs in demo mode. Use the demo app instead of signing in.",
+    "demoNotice": "Accounts aren't switched on in this copy (demo mode). Use the demo app instead of signing in.",
     "email": "Email",
     "password": "Password",
     "fullName": "Full name",
@@ -652,7 +652,8 @@
     "reset": {
       "title": "New password",
       "subtitle": "Choose a new password for your account.",
-      "save": "Save new password"
+      "save": "Save new password",
+      "done": "Your password was changed. Sign in with your new password."
     },
     "errors": {
       "email": "Enter a valid email address",
@@ -664,7 +665,8 @@
       "samePassword": "Choose a password different from your current one.",
       "linkExpired": "This link has expired or was already used. Request a new one.",
       "generic": "Something went wrong. Please try again in a moment.",
-      "notConfigured": "Accounts aren't connected yet (demo mode)."
+      "notConfigured": "Accounts aren't connected yet (demo mode).",
+      "tooMany": "Too many attempts. Wait a minute and try again."
     }
   }
 }

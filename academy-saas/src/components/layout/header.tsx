@@ -8,7 +8,7 @@ import { usePathname, useRouter } from '@/i18n/navigation';
 import { routing, type Locale } from '@/i18n/routing';
 import { useStore } from '@/lib/store/academy-store';
 import { ThemeToggle } from './theme-toggle';
-import { supabaseConfigured } from '@/lib/supabase/env';
+import { accountsEnabled } from '@/lib/accounts-enabled';
 import { signOut } from '@/features/auth/actions';
 
 const LANG_LABEL: Record<Locale, string> = { en: 'English', ar: 'العربية', fr: 'Français' };
@@ -96,7 +96,7 @@ export function Header({ onMenu }: { onMenu: () => void }) {
                 {u.id === user.id && <Check className="size-4 text-brand-500" />}
               </button>
             ))}
-            {supabaseConfigured && (
+            {accountsEnabled && (
               <form action={signOut} className="mt-1 border-t border-line pt-1">
                 <input type="hidden" name="locale" value={locale} />
                 <button type="submit" className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-start text-sm text-red-600 hover:bg-red-50"><LogOut className="size-4" />{ta('signOut')}</button>

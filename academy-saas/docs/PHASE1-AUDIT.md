@@ -1,6 +1,6 @@
 # AcademyOS — Phase 1: Audit & Technical Plan
 
-Status: proposal for review. **No application code was changed for this phase.**
+Status: approved. **Update (Phase 2):** Supabase was replaced by **Neon (PostgreSQL) + Better Auth** (see §2). The database design, RLS rules and tests are unchanged in substance.
 Scope: the AcademyOS prototype (the standalone `AcademyOS.html` and the source it is built from, in `academy-saas/`).
 
 ---
@@ -91,7 +91,9 @@ Scope: the AcademyOS prototype (the standalone `AcademyOS.html` and the source i
 | Need | Choice | Why |
 |---|---|---|
 | Hosting (app) | **Vercel** | Made for Next.js; preview link per change; free to start. |
-| Database / Auth / Storage | **Supabase**, region **EU (Frankfurt)** | GDPR-friendly default for international customers; the region can't easily be changed later. |
+| Database | **Neon** (serverless PostgreSQL), region **EU (Frankfurt)** | Standard PostgreSQL (all RLS rules work unchanged), generous free plan, database branches for testing. |
+| Accounts | **Better Auth** (inside the app) | Users and sessions stored in our own database; no third-party login service; email + password, verification, reset, 2FA later. |
+| File storage | **Cloudflare R2** (Phase 3a) | Private bucket, signed links, no egress fees. |
 | Server logic | Next.js **Server Components** (reads) + **Server Actions** (writes) | One codebase, and no API keys in the browser. |
 | Money and numbering | **PostgreSQL functions** (`record_payment`, `issue_invoice`, `run_billing`) | Atomic transactions; the same rules no matter who calls them. |
 | Transactional email | **Resend** (or Supabase SMTP) | Invitations, password reset, later reminders. |
@@ -99,8 +101,8 @@ Scope: the AcademyOS prototype (the standalone `AcademyOS.html` and the source i
 | Tests | Vitest (logic), SQL/pgTAP (RLS), **Playwright** (end-to-end) | Isolation and roles tested on every change. |
 | CI | GitHub Actions | Nothing merges unless the checks pass. |
 
-**Request flow:** browser → Next.js server (reads the user's session cookie) → Supabase, *as that user*, so RLS applies → result.
-The secret service-role key is used only by a few server-only admin jobs (e.g. creating an academy at sign-up), never in the browser.
+**Request flow:** browser → Next.js server (validates the session cookie with Better Auth) → PostgreSQL through `withUser()`, which switches to the restricted `authenticated` role and sets the user id, so RLS applies → result.
+The database password and auth secret exist only in server environment variables, never in the browser.
 
 **Proposed folder structure**
 

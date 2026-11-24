@@ -1,6 +1,6 @@
 -- =============================================================================
 -- Phase 2: coaches only see their own teams (audit finding #5), and every new
--- Supabase Auth user automatically gets a profile row.
+-- account (auth_user) automatically gets a profile row.
 -- =============================================================================
 
 -- ---------------------------------------------------------------- coach scope
@@ -24,14 +24,12 @@ create or replace function app.handle_new_user() returns trigger
 language plpgsql security definer set search_path = public as $$
 begin
   insert into public.profiles(id, full_name, preferred_locale)
-  values (new.id,
-          nullif(trim(new.raw_user_meta_data->>'full_name'), ''),
-          case when new.raw_user_meta_data->>'locale' in ('en', 'ar', 'fr') then new.raw_user_meta_data->>'locale' end)
+  values (new.id, nullif(trim(new.name), ''), case when new.locale in ('en', 'ar', 'fr') then new.locale end)
   on conflict (id) do nothing;
   return new;
 end $$;
 
-drop trigger if exists on_auth_user_created on auth.users;
+drop trigger if exists on_auth_user_created on public.auth_user;
 create trigger on_auth_user_created
-  after insert on auth.users
+  after insert on public.auth_user
   for each row execute function app.handle_new_user();

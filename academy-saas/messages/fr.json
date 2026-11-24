@@ -621,7 +621,7 @@
     "panelTitle": "Gérez votre académie comme un club pro",
     "panelText": "Joueurs, équipes, présences, plannings, factures et paiements, au même endroit et en toute sécurité, en anglais, arabe et français.",
     "panelFooter": "Les données de votre académie sont privées et séparées de toutes les autres académies.",
-    "demoNotice": "Les comptes ne sont pas encore connectés : cette version fonctionne en mode démo. Utilisez l'application de démo au lieu de vous connecter.",
+    "demoNotice": "Les comptes ne sont pas activés dans cette version (mode démo). Utilisez l'application de démo au lieu de vous connecter.",
     "email": "E-mail",
     "password": "Mot de passe",
     "fullName": "Nom complet",
@@ -652,7 +652,8 @@
     "reset": {
       "title": "Nouveau mot de passe",
       "subtitle": "Choisissez un nouveau mot de passe pour votre compte.",
-      "save": "Enregistrer le mot de passe"
+      "save": "Enregistrer le mot de passe",
+      "done": "Votre mot de passe a été modifié. Connectez-vous avec le nouveau."
     },
     "errors": {
       "email": "Saisissez une adresse e-mail valide",
@@ -664,7 +665,8 @@
       "samePassword": "Choisissez un mot de passe différent de l'actuel.",
       "linkExpired": "Ce lien a expiré ou a déjà été utilisé. Demandez-en un nouveau.",
       "generic": "Un problème est survenu. Réessayez dans un instant.",
-      "notConfigured": "Les comptes ne sont pas encore connectés (mode démo)."
+      "notConfigured": "Les comptes ne sont pas encore connectés (mode démo).",
+      "tooMany": "Trop de tentatives. Patientez une minute puis réessayez."
     }
   }
 }

@@ -1,5 +1,5 @@
 /**
- * Role → capability matrix. Mirrors the SQL RLS policies in supabase/migrations.
+ * Role → capability matrix. Mirrors the SQL RLS policies in database/migrations.
  * The UI uses this to hide actions; the DATABASE is what actually enforces access.
  */
 import type { AcademyData, ID, Role } from '@/lib/types';

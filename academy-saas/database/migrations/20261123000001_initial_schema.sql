@@ -47,9 +47,9 @@ create table public.academies (
   deleted_at      timestamptz                    -- soft delete; hard delete handled by a retention job
 );
 
--- 1:1 with auth.users (managed by Supabase Auth)
+-- 1:1 with auth_user (accounts managed by Better Auth)
 create table public.profiles (
-  id                uuid primary key references auth.users(id) on delete cascade,
+  id                uuid primary key references public.auth_user(id) on delete cascade,
   full_name         text,
   preferred_locale  text check (preferred_locale in ('en', 'ar', 'fr')),
   created_at        timestamptz not null default now()
@@ -58,7 +58,7 @@ create table public.profiles (
 create table public.academy_members (
   id          uuid primary key default gen_random_uuid(),
   academy_id  uuid not null references public.academies(id) on delete cascade,
-  user_id     uuid not null references auth.users(id) on delete cascade,
+  user_id     uuid not null references public.auth_user(id) on delete cascade,
   role        public.member_role not null,
   status      public.member_status not null default 'active',
   created_at  timestamptz not null default now(),
@@ -90,7 +90,7 @@ create table public.locations (                 -- pitches, courts, halls
 create table public.coaches (
   id          uuid primary key default gen_random_uuid(),
   academy_id  uuid not null references public.academies(id) on delete cascade,
-  user_id     uuid references auth.users(id) on delete set null,
+  user_id     uuid references public.auth_user(id) on delete set null,
   full_name   text not null,
   email       text,
   phone       text,
@@ -206,9 +206,9 @@ create table public.attendance_records (
   player_id    uuid not null,
   status       public.attendance_status not null,
   note         text,
-  recorded_by  uuid references auth.users(id),
+  recorded_by  uuid references public.auth_user(id),
   recorded_at  timestamptz not null default now(),
-  updated_by   uuid references auth.users(id),
+  updated_by   uuid references public.auth_user(id),
   updated_at   timestamptz,
   unique (session_id, player_id),
   foreign key (academy_id, session_id) references public.training_sessions(academy_id, id) on delete cascade,
@@ -226,7 +226,7 @@ create table public.invoices (
   due_date    date not null,
   status      public.invoice_status not null default 'draft',
   notes       text,
-  created_by  uuid references auth.users(id),
+  created_by  uuid references public.auth_user(id),
   created_at  timestamptz not null default now(),
   check (due_date >= issue_date),
   unique (academy_id, id),
@@ -256,7 +256,7 @@ create table public.payments (
   paid_on         date not null default current_date,
   method          public.payment_method not null,
   reference       text,
-  received_by     uuid references auth.users(id),
+  received_by     uuid references public.auth_user(id),
   voided_at       timestamptz,                   -- payments are voided, never deleted
   void_reason     text,
   created_at      timestamptz not null default now(),

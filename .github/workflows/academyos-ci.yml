@@ -45,5 +45,5 @@ jobs:
         env:
           PGURL: postgres://postgres:postgres@localhost:5432/postgres
         run: |
-          sh supabase/tests/run_local.sh | tee result.txt
+          sh database/tests/run_local.sh | tee result.txt
           grep -q "ALL TESTS PASSED" result.txt
