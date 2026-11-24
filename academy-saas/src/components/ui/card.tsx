@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import type { ReactNode } from 'react';
 
 export function Card({ className, children }: { className?: string; children: ReactNode }) {
-  return <section className={clsx('rounded-[var(--radius-card)] border border-line bg-white shadow-[var(--shadow-card)]', className)}>{children}</section>;
+  return <section className={clsx('rounded-[var(--radius-card)] border border-line bg-panel shadow-[var(--shadow-card)]', className)}>{children}</section>;
 }
 
 export function CardHeader({ title, subtitle, action }: { title: ReactNode; subtitle?: ReactNode; action?: ReactNode }) {

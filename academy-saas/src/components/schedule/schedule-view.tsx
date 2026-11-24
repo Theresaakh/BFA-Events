@@ -65,7 +65,7 @@ export function ScheduleView() {
     const tm = lk.teams.get(s.teamId);
     return (
       <button key={s.id} onClick={() => setOpen(s)} className={clsx('w-full rounded-lg border-s-[3px] px-2 py-1 text-start text-xs transition hover:brightness-95',
-        s.status === 'cancelled' ? 'border-red-400 bg-red-50 text-red-800/70 line-through' : tm?.sport === 'basketball' ? 'border-violet-500 bg-violet-50 text-violet-900' : 'border-navy-700 bg-navy-50 text-navy-900')}>
+        s.status === 'cancelled' ? 'border-red-400 bg-red-50 text-red-800/70 line-through' : tm?.sport === 'basketball' ? 'border-coral-500 bg-orange-50 text-orange-900' : 'border-navy-700 bg-navy-50 text-navy-900')}>
         <span className="tabular font-semibold">{fmt.time(s.startsAt)}</span> <span className={compact ? 'hidden xl:inline' : ''}>{tm?.name}</span>
       </button>
     );

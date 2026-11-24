@@ -26,7 +26,7 @@ function ShellSkeleton() {
     <div className="min-h-screen">
       <div className="fixed inset-y-0 start-0 hidden w-64 bg-navy-900 lg:block" />
       <div className="lg:ps-64">
-        <div className="h-16 border-b border-line bg-white" />
+        <div className="h-16 border-b border-line bg-panel" />
         <div className="space-y-4 p-8">
           <Skeleton className="h-8 w-56" />
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">{Array.from({ length: 8 }).map((_, i) => <Skeleton key={i} className="h-28" />)}</div>

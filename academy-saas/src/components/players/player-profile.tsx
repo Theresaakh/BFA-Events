@@ -67,7 +67,7 @@ export function PlayerProfile({ id }: { id: string }) {
         <div className="h-16 bg-gradient-to-r from-navy-900 to-navy-700" />
         <div className="flex flex-col gap-4 px-5 pb-5 sm:flex-row sm:items-end sm:justify-between">
           <div className="-mt-8 flex items-end gap-4">
-            <span className="grid size-20 place-items-center rounded-2xl border-4 border-white bg-brand-500 text-2xl font-semibold text-white shadow">{player.firstName[0]}{player.lastName[0]}</span>
+            <span className="grid size-20 place-items-center rounded-2xl border-4 border-panel bg-brand-500 text-2xl font-semibold text-white shadow">{player.firstName[0]}{player.lastName[0]}</span>
             <div className="pb-1">
               <h1 className="text-xl font-semibold">{player.firstName} {player.lastName}</h1>
               <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-muted">

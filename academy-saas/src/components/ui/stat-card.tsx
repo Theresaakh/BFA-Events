@@ -2,19 +2,24 @@ import clsx from 'clsx';
 import type { LucideIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 
-export function StatCard({ label, value, hint, icon: Icon, tone = 'navy' }: { label: ReactNode; value: ReactNode; hint?: ReactNode; icon: LucideIcon; tone?: 'navy' | 'green' | 'amber' | 'red' | 'blue' }) {
+const TONE = {
+  navy: 'bg-brand-500 text-white',
+  green: 'bg-emerald-500 text-white',
+  amber: 'bg-amber-400 text-navy-950',
+  red: 'bg-red-500 text-white',
+  blue: 'bg-navy-900 text-volt-400',
+} as const;
+
+export function StatCard({ label, value, hint, icon: Icon, tone = 'navy' }: { label: ReactNode; value: ReactNode; hint?: ReactNode; icon: LucideIcon; tone?: keyof typeof TONE }) {
   return (
-    <div className="rounded-[var(--radius-card)] border border-line bg-white p-4 shadow-[var(--shadow-card)] sm:p-5">
-      <div className="flex items-start justify-between gap-3">
-        <p className="text-xs font-medium text-muted">{label}</p>
-        <span className={clsx('grid size-8 shrink-0 place-items-center rounded-lg',
-          tone === 'navy' && 'bg-navy-50 text-navy-800', tone === 'green' && 'bg-brand-50 text-brand-700',
-          tone === 'amber' && 'bg-amber-50 text-amber-700', tone === 'red' && 'bg-red-50 text-red-600', tone === 'blue' && 'bg-sky-50 text-sky-700')}>
-          <Icon className="size-4" />
-        </span>
+    <div className="lift relative overflow-hidden rounded-[var(--radius-card)] border border-line bg-panel p-4 shadow-[var(--shadow-card)] sm:p-5">
+      <Icon aria-hidden className="pointer-events-none absolute -bottom-3 -end-3 size-20 text-navy-900/[0.04]" />
+      <div className="flex items-center gap-2.5">
+        <span className={clsx('grid size-7 shrink-0 place-items-center rounded-md shadow-sm', TONE[tone])}><Icon className="size-3.5" /></span>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted">{label}</p>
       </div>
-      <p className="tabular mt-2 text-xl font-semibold tracking-tight text-ink sm:text-2xl">{value}</p>
-      {hint && <p className="mt-1 text-xs text-muted">{hint}</p>}
+      <p className="tabular font-display mt-3 text-3xl font-bold leading-none text-ink sm:text-[34px]">{value}</p>
+      {hint && <p className="mt-1.5 text-xs text-muted">{hint}</p>}
     </div>
   );
 }

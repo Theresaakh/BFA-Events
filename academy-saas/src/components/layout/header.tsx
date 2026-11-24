@@ -7,6 +7,7 @@ import clsx from 'clsx';
 import { usePathname, useRouter } from '@/i18n/navigation';
 import { routing, type Locale } from '@/i18n/routing';
 import { useStore } from '@/lib/store/academy-store';
+import { ThemeToggle } from './theme-toggle';
 
 const LANG_LABEL: Record<Locale, string> = { en: 'English', ar: 'العربية', fr: 'Français' };
 
@@ -42,7 +43,7 @@ export function Header({ onMenu }: { onMenu: () => void }) {
   const initials = user.fullName.split(' ').map((p) => p[0]).slice(0, 2).join('');
 
   return (
-    <header className="no-print sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-line bg-white/85 px-4 backdrop-blur sm:px-6">
+    <header className="no-print sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-line bg-panel/85 px-4 backdrop-blur sm:px-6">
       <button onClick={onMenu} className="rounded-lg p-2 text-muted hover:bg-surface lg:hidden" aria-label={t('menu')}><Menu className="size-5" /></button>
 
       <form className="relative hidden max-w-md flex-1 md:block" onSubmit={(e) => { e.preventDefault(); router.push({ pathname: '/players', query: q ? { q } : {} }); }}>
@@ -51,13 +52,15 @@ export function Header({ onMenu }: { onMenu: () => void }) {
       </form>
       <div className="flex-1 md:hidden" />
 
+      <ThemeToggle />
+
       {/* language */}
       <div ref={langRef} className="relative">
         <button onClick={() => setLangOpen((o) => !o)} className="flex h-10 items-center gap-1.5 rounded-lg px-2.5 text-sm font-medium text-ink hover:bg-surface" aria-haspopup="menu">
           <Globe className="size-4 text-muted" /><span className="hidden sm:inline">{LANG_LABEL[locale]}</span><span className="uppercase sm:hidden">{locale}</span>
         </button>
         {langOpen && (
-          <div className="absolute end-0 top-12 w-44 rounded-xl border border-line bg-white p-1 shadow-[var(--shadow-pop)] animate-pop-in" role="menu">
+          <div className="absolute end-0 top-12 w-44 rounded-xl border border-line bg-panel p-1 shadow-[var(--shadow-pop)] animate-pop-in" role="menu">
             {routing.locales.map((l) => (
               <button key={l} onClick={() => switchLocale(l)} className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm hover:bg-surface" role="menuitem">
                 {LANG_LABEL[l]} {l === locale && <Check className="size-4 text-brand-500" />}
@@ -78,7 +81,7 @@ export function Header({ onMenu }: { onMenu: () => void }) {
           <ChevronDown className="hidden size-4 text-muted sm:block" />
         </button>
         {userOpen && (
-          <div className="absolute end-0 top-12 w-72 rounded-xl border border-line bg-white p-1.5 shadow-[var(--shadow-pop)] animate-pop-in">
+          <div className="absolute end-0 top-12 w-72 rounded-xl border border-line bg-panel p-1.5 shadow-[var(--shadow-pop)] animate-pop-in">
             <div className="flex items-start gap-2 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-900">
               <UserCog className="mt-0.5 size-4 shrink-0" />{t('viewAsHint')}
             </div>

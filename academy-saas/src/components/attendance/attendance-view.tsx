@@ -149,8 +149,8 @@ function SessionSheet({ session }: { session: TrainingSession }) {
                     <button key={s} disabled={readOnly} onClick={() => setMarks((m) => ({ ...m, [p.id]: s }))}
                       className={clsx('flex h-10 items-center justify-center gap-1.5 rounded-lg border px-3 text-xs font-medium transition sm:h-9 sm:min-w-24 disabled:cursor-not-allowed',
                         marks[p.id] === s
-                          ? s === 'present' ? 'border-brand-500 bg-brand-500 text-white' : s === 'absent' ? 'border-red-500 bg-red-500 text-white' : 'border-amber-500 bg-amber-500 text-white'
-                          : 'border-line bg-white text-muted hover:border-slate-300 hover:text-ink disabled:hover:border-line')}>
+                          ? s === 'present' ? 'border-emerald-500 bg-emerald-500 text-white' : s === 'absent' ? 'border-red-500 bg-red-500 text-white' : 'border-amber-500 bg-amber-500 text-white'
+                          : 'border-line bg-panel text-muted hover:border-slate-300 hover:text-ink disabled:hover:border-line')}>
                       {marks[p.id] === s && <Check className="size-3.5" />}{ta(s)}
                     </button>
                   ))}

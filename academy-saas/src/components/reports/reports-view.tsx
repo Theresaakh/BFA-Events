@@ -83,7 +83,7 @@ function Financial({ months }: { months: number }) {
       {otherCurrencies.length > 0 && <p className="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-900">{t('currencyNote', { currency: cur, others: otherCurrencies.join(', ') })}</p>}
       <Card>
         <CardHeader title={t('monthlyRevenue')} subtitle={t('inCurrency', { currency: cur })} action={<Button size="sm" className="no-print" onClick={() => downloadCSV(`financial-${today}.csv`, [[t('month'), t('invoiced'), t('collected'), t('outstanding'), t('invoices')], ...monthly.map((x) => [x.m, minorToInput(x.invoiced, cur), minorToInput(x.collected, cur), minorToInput(x.outstanding, cur), x.count])])}><Download className="size-4" />CSV</Button>} />
-        <div className="p-5"><BarChart data={monthly.map((x) => ({ label: mName(x.m), values: [x.invoiced, x.collected] }))} series={[{ name: t('invoiced'), color: '#142B45' }, { name: t('collected'), color: '#19B77A' }]} format={(n) => fmt.money(n)} /></div>
+        <div className="p-5"><BarChart data={monthly.map((x) => ({ label: mName(x.m), values: [x.invoiced, x.collected] }))} series={[{ name: t('invoiced'), color: 'var(--chart-ink)' }, { name: t('collected'), color: 'var(--chart-accent)' }]} format={(n) => fmt.money(n)} /></div>
         <Table>
           <thead><tr><Th>{t('month')}</Th><Th numeric>{t('invoices')}</Th><Th numeric>{t('invoiced')}</Th><Th numeric>{t('collected')}</Th><Th numeric>{t('outstanding')}</Th><Th className="w-40">{t('collectionRate')}</Th></tr></thead>
           <tbody>
@@ -156,7 +156,7 @@ function PlayersReport({ months }: { months: number }) {
     <div className="grid gap-6 xl:grid-cols-[2fr_1fr]">
       <Card>
         <CardHeader title={t('registrations')} action={<Button size="sm" className="no-print" onClick={() => downloadCSV(`registrations-${today}.csv`, [[t('month'), t('newPlayers')], ...list.map((m, i) => [m, regs[i].values[0]])])}><Download className="size-4" />CSV</Button>} />
-        <div className="p-5"><BarChart data={regs} series={[{ name: t('newPlayers'), color: '#19B77A' }]} format={(n) => fmt.number(n)} /></div>
+        <div className="p-5"><BarChart data={regs} series={[{ name: t('newPlayers'), color: 'var(--chart-accent)' }]} format={(n) => fmt.number(n)} /></div>
       </Card>
       <Card>
         <CardHeader title={t('byStatus')} />

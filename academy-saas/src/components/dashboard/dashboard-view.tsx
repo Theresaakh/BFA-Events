@@ -7,7 +7,6 @@ import { useFmt, useInvoiceBalances, useStore } from '@/lib/store/academy-store'
 import { can } from '@/lib/domain/permissions';
 import { sumByCurrency } from '@/lib/domain/finance';
 import { addDays, dateIn } from '@/lib/format';
-import { PageHeader } from '@/components/ui/page-header';
 import { StatCard } from '@/components/ui/stat-card';
 import { Card, CardHeader } from '@/components/ui/card';
 import { BarChart, Donut } from '@/components/ui/charts';
@@ -85,14 +84,38 @@ export function DashboardView() {
 
   return (
     <div>
-      <PageHeader
-        title={`${greeting}, ${user.fullName.split(' ')[0]}`}
-        description={t('subtitle', { date: fmt.date(today, 'long') })}
-        actions={<>
-          {can(user.role, 'attendance.record') && <Link href="/attendance" className={buttonClass('secondary')}><ClipboardCheck className="size-4" />{t('takeAttendance')}</Link>}
-          {can(user.role, 'finance.edit') && <Link href="/payments?new=1" className={buttonClass('primary')}><HandCoins className="size-4" />{t('recordPayment')}</Link>}
-        </>}
-      />
+      <section className="hero-glow relative mb-6 overflow-hidden rounded-2xl p-6 text-white shadow-[var(--shadow-pop)] sm:p-8">
+        <svg aria-hidden viewBox="0 0 420 260" className="pointer-events-none absolute -end-10 top-1/2 hidden h-[130%] -translate-y-1/2 opacity-[0.13] md:block" fill="none" stroke="white" strokeWidth="2">
+          <rect x="10" y="10" width="400" height="240" rx="4" /><path d="M210 10v240" /><circle cx="210" cy="130" r="42" /><circle cx="210" cy="130" r="3" fill="white" />
+          <rect x="10" y="70" width="62" height="120" /><rect x="10" y="100" width="22" height="60" /><rect x="348" y="70" width="62" height="120" /><rect x="388" y="100" width="22" height="60" />
+        </svg>
+        <div className="relative flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div className="min-w-0">
+            <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-volt-400">
+              <span className="relative flex size-2"><span className="absolute inline-flex size-full animate-ping rounded-full bg-volt-400 opacity-60" /><span className="relative inline-flex size-2 rounded-full bg-volt-400" /></span>
+              {t('matchday')} · {fmt.date(today, 'long')}
+            </p>
+            <h1 className="font-display mt-2 text-4xl font-bold uppercase leading-[0.95] tracking-tight sm:text-5xl">{greeting},<br className="sm:hidden" /> <span className="text-volt-400">{user.fullName.split(' ')[0]}</span></h1>
+            <p className="mt-2 max-w-xl text-sm text-navy-100/75">{data.academy.name}</p>
+            <div className="mt-5 flex flex-wrap gap-2.5">
+              {can(user.role, 'attendance.record') && <Link href="/attendance" className={buttonClass('secondary', 'md', 'border-white/15 bg-white/10 text-white shadow-none hover:bg-white/20 hover:text-white')}><ClipboardCheck className="size-4" />{t('takeAttendance')}</Link>}
+              {can(user.role, 'finance.edit') && <Link href="/payments?new=1" className={buttonClass('volt')}><HandCoins className="size-4" />{t('recordPayment')}</Link>}
+            </div>
+          </div>
+          <div className="grid grid-cols-3 overflow-hidden rounded-xl bg-white/[0.06] ring-1 ring-white/10 backdrop-blur-sm">
+            {[
+              [t('todaysSessions'), fmt.number(ops.todays.filter((s) => s.status !== 'cancelled').length)],
+              [t('attendanceRate'), fmt.percent(attRate)],
+              [t('activePlayers'), fmt.number(ops.active)],
+            ].map(([k, v]) => (
+              <div key={k} className="min-w-0 px-4 py-3 text-center [&:not(:last-child)]:border-e [&:not(:last-child)]:border-white/10 sm:px-6">
+                <p className="tabular font-display text-3xl font-bold leading-none sm:text-4xl">{v}</p>
+                <p className="mt-1.5 truncate text-[10px] font-semibold uppercase tracking-[0.1em] text-navy-100/70">{k}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <StatCard label={t('registeredPlayers')} value={fmt.number(ops.registered)} icon={Users} />
@@ -113,7 +136,7 @@ export function DashboardView() {
         {money ? (
           <Card className="xl:col-span-2">
             <CardHeader title={t('revenueTitle')} subtitle={t('revenueSubtitle', { currency: fmt.currency })} />
-            <div className="p-5"><BarChart data={money.chart} format={(n) => fmt.money(n)} series={[{ name: t('invoiced'), color: '#142B45' }, { name: t('collected'), color: '#19B77A' }]} /></div>
+            <div className="p-5"><BarChart data={money.chart} format={(n) => fmt.money(n)} series={[{ name: t('invoiced'), color: 'var(--chart-ink)' }, { name: t('collected'), color: 'var(--chart-accent)' }]} /></div>
           </Card>
         ) : (
           renderToday(ops.todays, 'xl:col-span-2')
@@ -122,12 +145,12 @@ export function DashboardView() {
           <CardHeader title={t('attendanceOverview')} subtitle={t('last30days')} />
           <div className="flex items-center gap-6 p-5">
             <Donut parts={[
-              { label: 'present', value: ops.att.present, color: '#19B77A' },
+              { label: 'present', value: ops.att.present, color: '#10B981' },
               { label: 'absent', value: ops.att.absent, color: '#ef4444' },
               { label: 'excused', value: ops.att.excused, color: '#f59e0b' },
             ]} center={<div><p className="tabular text-xl font-semibold">{fmt.percent(attRate)}</p><p className="text-[11px] text-muted">{t('present')}</p></div>} />
             <ul className="space-y-2.5 text-sm">
-              {([['present', '#19B77A'], ['absent', '#ef4444'], ['excused', '#f59e0b']] as const).map(([k, c]) => (
+              {([['present', '#10B981'], ['absent', '#ef4444'], ['excused', '#f59e0b']] as const).map(([k, c]) => (
                 <li key={k} className="flex items-center gap-2"><span className="size-2.5 rounded-full" style={{ background: c }} />{t(k)}<span className="tabular ms-auto ps-4 font-medium">{fmt.number(ops.att[k])}</span></li>
               ))}
             </ul>

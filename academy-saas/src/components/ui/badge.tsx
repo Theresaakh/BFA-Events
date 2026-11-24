@@ -4,13 +4,13 @@ import type { ReactNode } from 'react';
 export type Tone = 'green' | 'gray' | 'red' | 'amber' | 'blue' | 'navy' | 'violet';
 
 const TONES: Record<Tone, string> = {
-  green: 'bg-brand-50 text-brand-700 ring-brand-500/20',
+  green: 'bg-emerald-50 text-emerald-700 ring-emerald-600/20',
   gray: 'bg-slate-100 text-slate-600 ring-slate-500/15',
   red: 'bg-red-50 text-red-700 ring-red-600/15',
   amber: 'bg-amber-50 text-amber-800 ring-amber-600/20',
   blue: 'bg-sky-50 text-sky-700 ring-sky-600/15',
   navy: 'bg-navy-50 text-navy-800 ring-navy-700/15',
-  violet: 'bg-violet-50 text-violet-700 ring-violet-600/15',
+  violet: 'bg-orange-50 text-orange-700 ring-orange-600/20',
 };
 
 export function Badge({ tone = 'gray', children, dot = true }: { tone?: Tone; children: ReactNode; dot?: boolean }) {

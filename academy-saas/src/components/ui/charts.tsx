@@ -20,9 +20,9 @@ export function BarChart({ data, series, height = 220, format }: {
     <div>
       <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full" role="img">
         {[0.25, 0.5, 0.75, 1].map((g) => (
-          <line key={g} x1={left} x2={W - right} y1={top + inner * (1 - g)} y2={top + inner * (1 - g)} stroke="#e4e8ee" strokeDasharray="3 4" />
+          <line key={g} x1={left} x2={W - right} y1={top + inner * (1 - g)} y2={top + inner * (1 - g)} stroke="var(--color-line)" strokeDasharray="3 4" />
         ))}
-        <line x1={left} x2={W - right} y1={top + inner} y2={top + inner} stroke="#cbd5e1" />
+        <line x1={left} x2={W - right} y1={top + inner} y2={top + inner} stroke="var(--color-slate-300)" />
         {ordered.map((d, i) => {
           const x0 = left + i * bw + (bw - group) / 2;
           return (
@@ -35,7 +35,7 @@ export function BarChart({ data, series, height = 220, format }: {
                   </rect>
                 );
               })}
-              <text x={left + i * bw + bw / 2} y={H - 8} textAnchor="middle" fontSize="11" fill="#64748b">{d.label}</text>
+              <text x={left + i * bw + bw / 2} y={H - 8} textAnchor="middle" fontSize="11" fill="var(--color-muted)">{d.label}</text>
             </g>
           );
         })}
@@ -54,7 +54,7 @@ export function Donut({ parts, size = 140, center }: { parts: { label: string; v
   return (
     <div className="relative grid place-items-center" style={{ width: size, height: size }}>
       <svg viewBox="0 0 120 120" className="size-full -rotate-90">
-        <circle cx="60" cy="60" r={r} fill="none" stroke="#eef1f5" strokeWidth="14" />
+        <circle cx="60" cy="60" r={r} fill="none" stroke="var(--color-line)" strokeWidth="14" />
         {segments.map((p) => (
           <circle key={p.label} cx="60" cy="60" r={r} fill="none" stroke={p.color} strokeWidth="14" strokeDasharray={`${p.len} ${c - p.len}`} strokeDashoffset={-p.offset}><title>{p.label}</title></circle>
         ))}
@@ -65,7 +65,7 @@ export function Donut({ parts, size = 140, center }: { parts: { label: string; v
 }
 
 export function ProgressBar({ value, tone = 'green' }: { value: number; tone?: 'green' | 'amber' | 'red' }) {
-  const color = tone === 'green' ? 'bg-brand-500' : tone === 'amber' ? 'bg-amber-500' : 'bg-red-500';
+  const color = tone === 'green' ? 'bg-emerald-500' : tone === 'amber' ? 'bg-amber-500' : 'bg-red-500';
   return (
     <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
       <div className={`h-full rounded-full ${color}`} style={{ width: `${Math.max(0, Math.min(100, value * 100))}%` }} />

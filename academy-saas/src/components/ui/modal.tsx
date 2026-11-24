@@ -22,7 +22,7 @@ export function Modal({ open, onClose, title, description, children, footer, siz
   if (!open) return null;
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-navy-950/45 p-0 backdrop-blur-[2px] sm:items-start sm:p-6 sm:pt-[8vh]" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div ref={panel} role="dialog" aria-modal="true" className={clsx('flex max-h-[92vh] w-full flex-col overflow-hidden rounded-t-2xl bg-white shadow-[var(--shadow-pop)] animate-pop-in sm:rounded-2xl',
+      <div ref={panel} role="dialog" aria-modal="true" className={clsx('flex max-h-[92vh] w-full flex-col overflow-hidden rounded-t-2xl bg-panel shadow-[var(--shadow-pop)] animate-pop-in sm:rounded-2xl',
         size === 'sm' && 'sm:max-w-md', size === 'md' && 'sm:max-w-xl', size === 'lg' && 'sm:max-w-3xl', size === 'xl' && 'sm:max-w-5xl')}>
         <div className="flex items-start justify-between gap-4 border-b border-line px-6 py-4">
           <div>

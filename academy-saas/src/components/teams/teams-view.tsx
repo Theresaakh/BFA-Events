@@ -71,10 +71,10 @@ export function TeamsView() {
               const att = attendanceRate.get(team.id);
               const rate = att && att.n ? att.p / att.n : 0;
               return (
-                <Card key={team.id} className="flex flex-col p-5 transition hover:shadow-md">
+                <Card key={team.id} className="lift flex flex-col p-5">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-3">
-                      <span className={`grid size-10 place-items-center rounded-xl text-white ${team.sport === 'football' ? 'bg-navy-900' : 'bg-violet-600'}`}><Shield className="size-5" /></span>
+                      <span className={`grid size-10 place-items-center rounded-xl text-white ${team.sport === 'football' ? 'bg-navy-900 text-volt-400' : 'bg-coral-500'}`}><Shield className="size-5" /></span>
                       <div><p className="font-semibold">{team.name}</p><p className="text-xs text-muted">{[team.ageGroup, team.category, team.season].filter(Boolean).join(' · ')}</p></div>
                     </div>
                     <Badge tone={team.sport === 'football' ? 'navy' : 'violet'} dot={false}>{tsp(team.sport)}</Badge>
