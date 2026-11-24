@@ -68,10 +68,14 @@ export function validateAllocations(
   payments: Payment[],
   today: ISODate,
 ): void {
-  const sum = requested.reduce((s, r) => s + r.amount, 0);
   if (requested.some((r) => !Number.isInteger(r.amount) || r.amount <= 0)) throw new AllocationError('invalidAmount');
+  const sum = requested.reduce((s, r) => s + r.amount, 0);
   if (sum > payment.amount) throw new AllocationError('exceedsPayment');
-  for (const r of requested) {
+  // Group by invoice first: listing the same invoice twice must not bypass the balance check.
+  const perInvoice = new Map<ID, number>();
+  for (const r of requested) perInvoice.set(r.invoiceId, (perInvoice.get(r.invoiceId) ?? 0) + r.amount);
+  for (const [invoiceId, amount] of perInvoice) {
+    const r = { invoiceId, amount };
     const inv = invoices.find((i) => i.id === r.invoiceId);
     if (!inv) throw new AllocationError('invoiceNotFound');
     if (inv.status !== 'issued') throw new AllocationError('invoiceNotIssued');

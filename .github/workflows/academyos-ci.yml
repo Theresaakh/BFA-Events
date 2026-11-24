@@ -1,0 +1,49 @@
+name: AcademyOS CI
+
+on:
+  push:
+    paths: ['academy-saas/**', '.github/workflows/academyos-ci.yml']
+  pull_request:
+    paths: ['academy-saas/**', '.github/workflows/academyos-ci.yml']
+
+defaults:
+  run:
+    working-directory: academy-saas
+
+jobs:
+  app:
+    name: Lint, types, unit tests, translations, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: academy-saas/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npx tsc --noEmit
+      - run: npm test
+      - run: npm run check:i18n
+      - run: npm run build
+
+  database:
+    name: Database security & finance rules (RLS)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run RLS and finance tests
+        env:
+          PGURL: postgres://postgres:postgres@localhost:5432/postgres
+        run: |
+          sh supabase/tests/run_local.sh | tee result.txt
+          grep -q "ALL TESTS PASSED" result.txt

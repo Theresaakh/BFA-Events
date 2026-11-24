@@ -15,6 +15,8 @@ export default defineConfig({
       { find: /^next\/navigation$/, replacement: r('shims/next-navigation.ts') },
       { find: /^@\/i18n\/navigation$/, replacement: r('shims/i18n-navigation.tsx') },
       { find: /^@\/i18n\/routing$/, replacement: r('shims/i18n-routing.ts') },
+      { find: /^@\/features\/auth\/actions$/, replacement: r('shims/auth-actions.ts') },
+      { find: /^@\/lib\/supabase\/env$/, replacement: r('shims/supabase-env.ts') },
       { find: /^@\//, replacement: r('../src') + '/' },
     ],
   },

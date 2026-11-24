@@ -81,6 +81,8 @@ insert into attendance_records(academy_id,session_id,player_id,status,recorded_b
 select t.ok(true, 'coach records attendance for own team');
 select t.fails($$insert into attendance_records(academy_id,session_id,player_id,status,recorded_by) values ('aaaaaaaa-0000-0000-0000-000000000000','e2000000-0000-0000-0000-000000000000','d2000000-0000-0000-0000-000000000000','present','00000000-0000-0000-0000-00000000000c')$$, 'coach cannot record attendance for another team');
 select t.ok((select count(*) from training_sessions) = 1, 'coach sees only own team sessions');
+select t.ok((select count(*) from teams) = 1, 'coach sees only their own team (not the other teams of the academy)');
+select t.ok((select count(*) from coaches) = 1, 'coach sees only themselves / their co-coaches');
 reset role;
 
 -- =========== Owner A corrects attendance -> audited ===========
@@ -122,5 +124,12 @@ reset role;
 -- anonymous users see nothing
 set role anon;
 select t.fails($$select count(*) from players$$, 'anonymous users cannot read players');
+reset role;
+-- profile auto-creation
+insert into auth.users(id,email,raw_user_meta_data) values ('00000000-0000-0000-0000-0000000000ee','new@example.test','{"full_name":"New Person","locale":"ar"}');
+select t.ok((select full_name='New Person' and preferred_locale='ar' from profiles where id='00000000-0000-0000-0000-0000000000ee'), 'new auth user gets a profile automatically');
+select set_config('request.jwt.claim.sub','00000000-0000-0000-0000-00000000000b',false);
+set role authenticated;
+select t.ok((select count(*) from profiles) = 1 and (select id from profiles) = '00000000-0000-0000-0000-00000000000b', 'users see only their own profile, never other people''s');
 reset role;
 \echo ALL TESTS PASSED

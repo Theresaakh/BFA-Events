@@ -615,5 +615,56 @@
     "auditLog": "Journal d'audit",
     "auditHint": "Modifications sensibles récentes (plus récentes en premier)",
     "auditRestricted": "Seuls les propriétaires et administrateurs peuvent consulter le journal d'audit."
+  },
+  "auth": {
+    "panelKicker": "Gestion d'académies sportives",
+    "panelTitle": "Gérez votre académie comme un club pro",
+    "panelText": "Joueurs, équipes, présences, plannings, factures et paiements, au même endroit et en toute sécurité, en anglais, arabe et français.",
+    "panelFooter": "Les données de votre académie sont privées et séparées de toutes les autres académies.",
+    "demoNotice": "Les comptes ne sont pas encore connectés : cette version fonctionne en mode démo. Utilisez l'application de démo au lieu de vous connecter.",
+    "email": "E-mail",
+    "password": "Mot de passe",
+    "fullName": "Nom complet",
+    "forgotLink": "Mot de passe oublié ?",
+    "signIn": "Se connecter",
+    "signInSubtitle": "Bon retour. Connectez-vous à votre académie.",
+    "pleaseWait": "Veuillez patienter…",
+    "noAccount": "Nouveau sur AcademyOS ?",
+    "createAccount": "Créer un compte",
+    "haveAccount": "Vous avez déjà un compte ?",
+    "backToSignIn": "Retour à la connexion",
+    "passwordHint": "Au moins 10 caractères. Une courte phrase fonctionne bien.",
+    "termsNote": "Utilisez votre e-mail professionnel. Ne partagez jamais votre mot de passe.",
+    "newPassword": "Nouveau mot de passe",
+    "confirmPassword": "Confirmer le nouveau mot de passe",
+    "signOut": "Se déconnecter",
+    "signup": {
+      "title": "Créer un compte",
+      "subtitle": "Commencez par votre compte. Vous configurerez votre académie ensuite.",
+      "checkEmail": "Vérifiez votre boîte de réception : nous vous avons envoyé un lien pour confirmer votre adresse e-mail."
+    },
+    "forgot": {
+      "title": "Réinitialiser",
+      "subtitle": "Saisissez votre e-mail et nous vous enverrons un lien de réinitialisation.",
+      "send": "Envoyer le lien",
+      "sent": "Si un compte existe pour cet e-mail, un lien de réinitialisation arrive. Il expire dans 1 heure."
+    },
+    "reset": {
+      "title": "Nouveau mot de passe",
+      "subtitle": "Choisissez un nouveau mot de passe pour votre compte.",
+      "save": "Enregistrer le mot de passe"
+    },
+    "errors": {
+      "email": "Saisissez une adresse e-mail valide",
+      "passwordLength": "Utilisez au moins 10 caractères",
+      "mismatch": "Les mots de passe ne correspondent pas",
+      "invalidCredentials": "E-mail ou mot de passe incorrect.",
+      "notConfirmed": "Veuillez d'abord confirmer votre e-mail : le lien est dans votre boîte de réception.",
+      "weakPassword": "Ce mot de passe est trop facile à deviner. Choisissez-en un plus long.",
+      "samePassword": "Choisissez un mot de passe différent de l'actuel.",
+      "linkExpired": "Ce lien a expiré ou a déjà été utilisé. Demandez-en un nouveau.",
+      "generic": "Un problème est survenu. Réessayez dans un instant.",
+      "notConfigured": "Les comptes ne sont pas encore connectés (mode démo)."
+    }
   }
 }

@@ -99,7 +99,7 @@ export function fieldErrors(error: z.ZodError): Record<string, string> {
   const out: Record<string, string> = {};
   for (const issue of error.issues) {
     const key = issue.path.join('.') || '_form';
-    if (!out[key]) out[key] = issue.message.startsWith('validation.') ? issue.message : 'validation.invalid';
+    if (!out[key]) out[key] = /^(validation|auth\.errors)\./.test(issue.message) ? issue.message : 'validation.invalid';
   }
   return out;
 }

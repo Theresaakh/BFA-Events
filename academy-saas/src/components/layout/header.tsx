@@ -2,12 +2,14 @@
 import { useState, useRef, useEffect } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
-import { Check, ChevronDown, Globe, Menu, Search, UserCog } from 'lucide-react';
+import { Check, ChevronDown, Globe, LogOut, Menu, Search, UserCog } from 'lucide-react';
 import clsx from 'clsx';
 import { usePathname, useRouter } from '@/i18n/navigation';
 import { routing, type Locale } from '@/i18n/routing';
 import { useStore } from '@/lib/store/academy-store';
 import { ThemeToggle } from './theme-toggle';
+import { supabaseConfigured } from '@/lib/supabase/env';
+import { signOut } from '@/features/auth/actions';
 
 const LANG_LABEL: Record<Locale, string> = { en: 'English', ar: 'العربية', fr: 'Français' };
 
@@ -24,6 +26,7 @@ function useClickOutside(onOutside: () => void) {
 export function Header({ onMenu }: { onMenu: () => void }) {
   const t = useTranslations('header');
   const tr = useTranslations('enums.role');
+  const ta = useTranslations('auth');
   const locale = useLocale() as Locale;
   const router = useRouter();
   const pathname = usePathname();
@@ -93,6 +96,12 @@ export function Header({ onMenu }: { onMenu: () => void }) {
                 {u.id === user.id && <Check className="size-4 text-brand-500" />}
               </button>
             ))}
+            {supabaseConfigured && (
+              <form action={signOut} className="mt-1 border-t border-line pt-1">
+                <input type="hidden" name="locale" value={locale} />
+                <button type="submit" className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-start text-sm text-red-600 hover:bg-red-50"><LogOut className="size-4" />{ta('signOut')}</button>
+              </form>
+            )}
           </div>
         )}
       </div>

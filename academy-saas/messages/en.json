@@ -615,5 +615,56 @@
     "auditLog": "Audit log",
     "auditHint": "Recent sensitive changes (latest first)",
     "auditRestricted": "Only owners and administrators can view the audit log."
+  },
+  "auth": {
+    "panelKicker": "Sports academy management",
+    "panelTitle": "Run your academy like a pro club",
+    "panelText": "Players, teams, attendance, schedules, invoices and payments in one secure place, in English, Arabic and French.",
+    "panelFooter": "Your academy's data is private and separated from every other academy.",
+    "demoNotice": "Accounts aren't connected yet: this copy runs in demo mode. Use the demo app instead of signing in.",
+    "email": "Email",
+    "password": "Password",
+    "fullName": "Full name",
+    "forgotLink": "Forgot password?",
+    "signIn": "Sign in",
+    "signInSubtitle": "Welcome back. Sign in to your academy.",
+    "pleaseWait": "Please wait…",
+    "noAccount": "New to AcademyOS?",
+    "createAccount": "Create account",
+    "haveAccount": "Already have an account?",
+    "backToSignIn": "Back to sign in",
+    "passwordHint": "At least 10 characters. A short sentence works well.",
+    "termsNote": "Use your work email. Never share your password.",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm new password",
+    "signOut": "Sign out",
+    "signup": {
+      "title": "Create account",
+      "subtitle": "Start with your own account. You'll set up your academy next.",
+      "checkEmail": "Check your inbox: we sent you a link to confirm your email address."
+    },
+    "forgot": {
+      "title": "Reset password",
+      "subtitle": "Enter your email and we'll send you a reset link.",
+      "send": "Send reset link",
+      "sent": "If an account exists for this email, a reset link is on its way. It expires in 1 hour."
+    },
+    "reset": {
+      "title": "New password",
+      "subtitle": "Choose a new password for your account.",
+      "save": "Save new password"
+    },
+    "errors": {
+      "email": "Enter a valid email address",
+      "passwordLength": "Use at least 10 characters",
+      "mismatch": "The passwords don't match",
+      "invalidCredentials": "Email or password is incorrect.",
+      "notConfirmed": "Please confirm your email first: check your inbox for the link.",
+      "weakPassword": "This password is too easy to guess. Choose a longer one.",
+      "samePassword": "Choose a password different from your current one.",
+      "linkExpired": "This link has expired or was already used. Request a new one.",
+      "generic": "Something went wrong. Please try again in a moment.",
+      "notConfigured": "Accounts aren't connected yet (demo mode)."
+    }
   }
 }

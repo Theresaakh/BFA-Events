@@ -54,6 +54,10 @@ describe('allocations', () => {
     expect(() => validateAllocations({ amount: 1000, currency: 'USD', playerId: 'p1' }, [{ invoiceId: 'inv1', amount: 2000 }], [inv()], [], [], today))
       .toThrow('exceedsPayment');
   });
+  it('rejects over-paying one invoice by listing it twice (regression)', () => {
+    expect(() => validateAllocations({ amount: 16000, currency: 'USD', playerId: 'p1' }, [{ invoiceId: 'inv1', amount: 8000 }, { invoiceId: 'inv1', amount: 8000 }], [inv()], [], [], today))
+      .toThrow('exceedsBalance');
+  });
   it('suggests oldest invoices first', () => {
     const invoices = [inv({ id: 'new', number: 'INV-2', dueDate: '2026-12-30' }), inv({ id: 'old', number: 'INV-1', dueDate: '2026-10-30' })];
     expect(suggestAllocations({ amount: 15000, currency: 'USD', playerId: 'p1' }, invoices, [], [], today))

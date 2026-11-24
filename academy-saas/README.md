@@ -1,7 +1,9 @@
 # AcademyOS (working name)
 
 International sports academy management SaaS — multi-tenant, EN / AR (RTL) / FR.
-**Status: Phase 1** — complete frontend running on fictional demo data. Not production-ready.
+**Status: Phase 2 (foundation)**: accounts (login, sign-up, password reset), route protection and CI are in place. Screens still use fictional demo data until Phase 3. Not production-ready.
+
+Plan and audit: [`docs/PHASE1-AUDIT.md`](docs/PHASE1-AUDIT.md).
 
 Read the architecture first: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
@@ -19,6 +21,14 @@ npm run dev
    and switch role (owner / admin / finance / coach) from the user menu in the top-right.
 
 Your changes are kept in the browser (localStorage). **Settings → Data & privacy → Reset demo data** starts over.
+
+## Connecting Supabase (accounts)
+
+1. Copy `.env.example` to `.env.local`.
+2. Fill in `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (Supabase → Project Settings → API).
+3. Apply the SQL files in `supabase/migrations/` in order.
+
+With these empty, the app runs in **demo mode**: no login, fictional data in the browser.
 
 ## Quality checks
 
