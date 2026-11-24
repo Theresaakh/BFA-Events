@@ -4,10 +4,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import pg from 'pg';
 
-const url = process.env.DATABASE_URL;
+// Prefer the direct (non-pooled) connection: migrations need one session for the whole run.
+const url = process.env.DIRECT_DATABASE_URL || process.env.DATABASE_URL;
 if (!url) { console.log('[migrate] DATABASE_URL not set: skipping (demo mode).'); process.exit(0); }
 const dir = path.join(path.dirname(new URL(import.meta.url).pathname), '..', 'database', 'migrations');
-const client = new pg.Client({ connectionString: url, ssl: /sslmode=require|neon\.tech/.test(url) ? { rejectUnauthorized: true } : undefined });
+const client = new pg.Client({ connectionString: url, ssl: /sslmode=(require|verify-full)|neon\.tech/.test(url) ? { rejectUnauthorized: true } : undefined });
 await client.connect();
 try {
   await client.query('select pg_advisory_lock(424242)');               // one deploy at a time

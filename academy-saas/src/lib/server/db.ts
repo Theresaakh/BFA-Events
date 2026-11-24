@@ -7,7 +7,7 @@ const g = globalThis as unknown as { __academyPool?: Pool };
 export const pool = g.__academyPool ??= new Pool({
   connectionString: DATABASE_URL,
   max: 10,
-  ssl: /sslmode=require|neon\.tech/.test(DATABASE_URL) ? { rejectUnauthorized: true } : undefined,
+  ssl: /sslmode=(require|verify-full)|neon\.tech/.test(DATABASE_URL) ? { rejectUnauthorized: true } : undefined,
 });
 
 /**
